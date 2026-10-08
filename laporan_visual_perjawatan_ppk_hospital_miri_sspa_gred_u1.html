@@ -1,0 +1,1507 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Laporan Perjawatan PPK Hospital Miri (SSPA Gred U1)</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <!-- FontAwesome Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              50: '#f0fdf4',
+              100: '#dcfce7',
+              500: '#16a34a',
+              600: '#15803d',
+              700: '#166534',
+              800: '#14532d',
+              900: '#052e16'
+            },
+            hospital: {
+              blue: '#0284c7',
+              navy: '#0f172a',
+              gold: '#eab308'
+            }
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+    }
+    .chart-card {
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .chart-card:hover {
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.08), 0 8px 10px -6px rgba(0, 0, 0, 0.04);
+    }
+    @media print {
+      .no-print {
+        display: none !important;
+      }
+      body {
+        background-color: white !important;
+        color: black !important;
+      }
+    }
+  </style>
+</head>
+<body class="bg-slate-50 text-slate-800 antialiased min-h-screen flex flex-col">
+
+  <header class="bg-gradient-to-r from-slate-900 via-sky-950 to-slate-900 text-white shadow-xl sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-3.5">
+      <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div class="flex items-center space-x-3.5">
+          <div class="w-12 h-12 rounded-xl bg-gradient-to-tr from-sky-500 to-emerald-400 flex items-center justify-center shadow-lg shadow-sky-500/20 text-white font-bold text-xl">
+            <i class="fa-solid fa-hospital-user"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-bold uppercase tracking-wider px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30">
+                Peralihan SSM → SSPA
+              </span>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/30 font-semibold">
+                Gred U1 Interaktif
+              </span>
+            </div>
+            <h1 class="text-lg md:text-xl font-extrabold tracking-tight text-white">
+              Data Perjawatan Pembantu Perawatan Kesihatan (PPK)
+            </h1>
+            <p class="text-xs text-sky-200">Hospital Miri, Sarawak • Papan Pemuka Analisis & Simulasi Sumber Manusia</p>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="flex items-center gap-2.5 self-end md:self-center no-print flex-wrap">
+          <button onclick="toggleSimulator()" class="px-3.5 py-2 text-xs font-semibold rounded-lg bg-sky-600 hover:bg-sky-500 text-white flex items-center gap-2 transition duration-150 shadow-sm shadow-sky-700/30">
+            <i class="fa-solid fa-sliders"></i> <span id="simBtnText">Simulasi Agihan Staf</span>
+          </button>
+          <button onclick="window.print()" class="px-3.5 py-2 text-xs font-semibold rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-2 transition duration-150 shadow-sm">
+            <i class="fa-solid fa-print"></i> Cetak / PDF
+          </button>
+          <button onclick="exportToCSV()" class="px-3.5 py-2 text-xs font-semibold rounded-lg bg-emerald-600 hover:bg-emerald-500 text-white flex items-center gap-2 transition duration-150 shadow-sm shadow-emerald-700/30">
+            <i class="fa-solid fa-file-excel"></i> Eksport CSV
+          </button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex-grow space-y-6">
+
+    <!-- Ringkasan Notis Peralihan SSPA -->
+    <div class="bg-gradient-to-r from-blue-50 via-sky-50 to-indigo-50 border border-blue-200/80 rounded-2xl p-4 md:p-5 shadow-sm">
+      <div class="flex items-start gap-3.5">
+        <div class="p-2.5 bg-blue-600 text-white rounded-xl shadow-md shrink-0 mt-0.5">
+          <i class="fa-solid fa-circle-info text-base"></i>
+        </div>
+        <div class="text-xs md:text-sm text-slate-700 space-y-1">
+          <div class="flex flex-wrap items-center justify-between gap-2">
+            <p class="font-bold text-slate-900 text-sm md:text-base">
+              Penyelarasan Skim SSPA Gred U1 & Interaktiviti Papan Pemuka
+            </p>
+            <span class="text-[11px] font-semibold text-sky-700 bg-sky-100/80 px-2 py-0.5 rounded-full">
+              💡 Tip: Klik pada carta atau kad ringkasan untuk menapis jadual secara terus
+            </span>
+          </div>
+          <p class="leading-relaxed">
+            Semua perjawatan SSM (Gred U14 & U11/U14) disatukan kepada <span class="font-bold text-blue-700">Gred U1</span>. Gunakan carta interaktif di bawah untuk menyaring data mengikut unit, melihat analisis jurang defisit/lebihan, kluster klinikal, dan modul simulasi pelarasan staf.
+          </p>
+        </div>
+      </div>
+    </div>
+
+    <section class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+      <!-- Kad 1: Jumlah Waran -->
+      <div onclick="setStatusFilter('ALL')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-blue-400 hover:shadow-md transition-all cursor-pointer relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-slate-500 group-hover:text-blue-600 transition">Jumlah Waran Rasmi</span>
+          <span class="w-9 h-9 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-sm font-bold group-hover:scale-110 transition">
+            <i class="fa-solid fa-id-badge"></i>
+          </span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold text-slate-900" id="stat-total-waran">323</span>
+          <span class="text-xs font-medium text-slate-500">jawatan</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>SSM U11/14: <strong class="text-slate-700">314</strong></span>
+          <span>SSM U14: <strong class="text-slate-700">9</strong></span>
+        </div>
+      </div>
+
+      <!-- Kad 2: Pengisian Sebenar -->
+      <div onclick="setStatusFilter('OPTIMUM')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-emerald-400 hover:shadow-md transition-all cursor-pointer relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-emerald-600 group-hover:text-emerald-700 transition">Pengisian Sebenar</span>
+          <span class="w-9 h-9 rounded-xl bg-emerald-50 text-emerald-600 flex items-center justify-center text-sm font-bold group-hover:scale-110 transition">
+            <i class="fa-solid fa-user-check"></i>
+          </span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold text-emerald-700" id="stat-total-isi">211</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800" id="stat-kadar-isi">65.3%</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Staf Bertugas: <strong class="text-slate-700" id="stat-staf-bertugas">211 orang</strong></span>
+          <span class="text-emerald-600 font-semibold flex items-center gap-1"><i class="fa-solid fa-filter text-[10px]"></i> Klik Tapis</span>
+        </div>
+      </div>
+
+      <!-- Kad 3: Kekosongan Bersih -->
+      <div onclick="setStatusFilter('KSG')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-amber-400 hover:shadow-md transition-all cursor-pointer relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-amber-600 group-hover:text-amber-700 transition">Baki Kekosongan Waran</span>
+          <span class="w-9 h-9 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-sm font-bold group-hover:scale-110 transition">
+            <i class="fa-solid fa-user-clock"></i>
+          </span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold text-amber-600" id="stat-total-ksg">112</span>
+          <span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-amber-100 text-amber-800" id="stat-kadar-ksg">34.7%</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span>Defisit Waran: <strong class="text-slate-700" id="stat-defisit-waran">112 kuota</strong></span>
+          <span class="text-amber-700 font-semibold flex items-center gap-1"><i class="fa-solid fa-filter text-[10px]"></i> Tapis Kekosongan</span>
+        </div>
+      </div>
+
+      <!-- Kad 4: Jabatan Lebihan Staf -->
+      <div onclick="setStatusFilter('LEBIHAN')" class="bg-white rounded-2xl p-5 border border-slate-200 shadow-sm hover:border-purple-400 hover:shadow-md transition-all cursor-pointer relative overflow-hidden group">
+        <div class="flex items-center justify-between">
+          <span class="text-xs font-bold uppercase tracking-wider text-purple-600 group-hover:text-purple-700 transition">Unit Lebihan Staf</span>
+          <span class="w-9 h-9 rounded-xl bg-purple-50 text-purple-600 flex items-center justify-center text-sm font-bold group-hover:scale-110 transition">
+            <i class="fa-solid fa-users-gear"></i>
+          </span>
+        </div>
+        <div class="mt-3 flex items-baseline gap-2">
+          <span class="text-3xl font-extrabold text-purple-700">4</span>
+          <span class="text-xs font-medium text-slate-500">jabatan terlibat</span>
+        </div>
+        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+          <span class="truncate" title="O&G (-18), Orto (-9), Nefro (-4), Rehab (-4)">O&G, Orto, Nefro, Rehab</span>
+          <span class="text-purple-600 font-semibold flex items-center gap-1"><i class="fa-solid fa-filter text-[10px]"></i> Tapis</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="simulatorPanel" class="hidden bg-slate-900 text-white rounded-2xl p-5 sm:p-6 shadow-xl border border-slate-800 transition-all duration-300">
+      <div class="flex flex-col md:flex-row md:items-center justify-between gap-4 pb-4 border-b border-slate-800">
+        <div>
+          <div class="flex items-center gap-2">
+            <span class="px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-sky-500/20 text-sky-300 border border-sky-400/30">
+              Modul Perancangan Eksekutif BSM
+            </span>
+            <span class="text-xs text-slate-400">• Interaktif Masa Nyata</span>
+          </div>
+          <h2 class="text-lg font-bold text-white mt-1 flex items-center gap-2">
+            <i class="fa-solid fa-calculator text-sky-400"></i>
+            Kalkulator Simulasi Agihan & Pengambilan PPK Gred U1
+          </h2>
+          <p class="text-xs text-slate-400">Uji senario penempatan staf baharu atau agihan fleksi untuk melihat kesan terhadap kadar pengisian Hospital Miri.</p>
+        </div>
+        <button onclick="resetSimulation()" class="self-start md:self-auto px-3 py-1.5 text-xs font-medium bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg border border-slate-700 flex items-center gap-1.5 transition">
+          <i class="fa-solid fa-arrow-rotate-left"></i> Set Semula Nilai Asal
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 pt-5">
+        <!-- Slider Tambahan Staf -->
+        <div class="space-y-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-300">Cadangan Pengambilan Baharu:</span>
+            <span class="font-mono font-bold text-sky-400 text-base" id="simNewHiresVal">+0 Staf</span>
+          </div>
+          <input type="range" id="simNewHiresSlider" min="0" max="112" value="0" step="1" oninput="updateSimulation()" class="w-full h-2 bg-slate-700 rounded-lg appearance-none cursor-pointer accent-sky-500">
+          <div class="flex justify-between text-[10px] text-slate-400">
+            <span>0 staf</span>
+            <span>+56 (Separuh Kekosongan)</span>
+            <span>+112 (Isi Penuh)</span>
+          </div>
+        </div>
+
+        <!-- Agihan Keutamaan Jabatan -->
+        <div class="space-y-3 bg-slate-800/60 p-4 rounded-xl border border-slate-700">
+          <div class="flex items-center justify-between text-xs">
+            <span class="font-semibold text-slate-300">Agihan Pengambilan Baharu Kepada:</span>
+          </div>
+          <select id="simTargetDept" onchange="updateSimulation()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200 focus:ring-1 focus:ring-sky-500 focus:outline-none">
+            <option value="PROPORTIONAL">Kadar Samarata / Berdasarkan Nisbah Defisit</option>
+            <option value="2.2.2">Fokus Utama: Pengurusan (42 Kekosongan)</option>
+            <option value="2.8.2">Fokus Utama: Paediatrik (36 Kekosongan)</option>
+            <option value="2.6.2">Fokus Utama: Pembedahan Am (26 Kekosongan)</option>
+            <option value="2.10.2">Fokus Utama: Anestesiologi (21 Kekosongan)</option>
+            <option value="2.3.2">Fokus Utama: Kecemasan & Trauma ETD (7 Kekosongan)</option>
+          </select>
+          <p class="text-[11px] text-slate-400">Pilih strategi penempatan keutamaan bagi kakitangan baharu yang disimulasikan.</p>
+        </div>
+
+        <!-- Keputusan Unjuran Simulasi -->
+        <div class="bg-gradient-to-br from-sky-950/70 to-slate-900 p-4 rounded-xl border border-sky-500/30 flex flex-col justify-between">
+          <div class="text-xs font-semibold text-sky-300 uppercase tracking-wider">Unjuran Hasil Simulasi</div>
+          <div class="grid grid-cols-2 gap-3 my-2 text-center">
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+              <span class="text-[10px] text-slate-400">Kadar Pengisian Baharu</span>
+              <p class="text-lg font-extrabold text-emerald-400" id="simResultRate">65.3%</p>
+            </div>
+            <div class="bg-slate-900/80 p-2 rounded-lg border border-slate-800">
+              <span class="text-[10px] text-slate-400">Baki Defisit Bersih</span>
+              <p class="text-lg font-extrabold text-amber-400" id="simResultDeficit">112</p>
+            </div>
+          </div>
+          <p class="text-[11px] text-slate-400 text-center" id="simResultSummary">Data semasa: 211 diisi daripada 323 waran jawatan.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Carta Utama: Taburan & Perbandingan Bersepadu -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm lg:col-span-2 flex flex-col justify-between chart-card">
+        <div>
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+            <div>
+              <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-chart-column text-sky-600"></i>
+                Kekuatan Perjawatan Mengikut Jabatan
+              </h2>
+              <p class="text-xs text-slate-500">Klik bar jabatan untuk menapis senarai jadual secara automatik</p>
+            </div>
+
+            <!-- Chart Filter Controls -->
+            <div class="flex flex-wrap items-center gap-1.5 text-xs bg-slate-100 p-1 rounded-xl">
+              <button onclick="setChartDatasetFilter('ALL')" id="chartBtn-ALL" class="px-2.5 py-1 rounded-lg font-semibold bg-white text-slate-800 shadow-sm transition">Semua</button>
+              <button onclick="setChartDatasetFilter('TOP_DEFICIT')" id="chartBtn-TOP_DEFICIT" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">Top Kekosongan</button>
+              <button onclick="setChartDatasetFilter('LEBIHAN')" id="chartBtn-LEBIHAN" class="px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition">Lebihan Sahaja</button>
+              <button onclick="toggleChartType()" class="px-2.5 py-1 rounded-lg font-semibold text-sky-700 bg-sky-50 hover:bg-sky-100 transition flex items-center gap-1">
+                <i class="fa-solid fa-arrows-rotate text-[10px]"></i> <span id="chartTypeLabel">Carta Menegak</span>
+              </button>
+            </div>
+          </div>
+
+          <div class="relative h-72 sm:h-80 w-full">
+            <canvas id="barChartDepartment"></canvas>
+          </div>
+        </div>
+
+        <div class="mt-4 pt-3 border-t border-slate-100 flex flex-wrap items-center justify-between text-xs text-slate-500 gap-2">
+          <div class="flex items-center gap-3">
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-sky-500"></span>Waran (SSPA Gred U1)</span>
+            <span class="inline-flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-emerald-500"></span>Pengisian Sebenar</span>
+          </div>
+          <span class="text-[11px] text-slate-400 italic">Interaktif: Arahkan kursor & klik mana-mana bar</span>
+        </div>
+      </div>
+
+      <!-- Carta 2: Analisis Jurang Bersih (Diverging Gap Chart: Defisit vs Lebihan) -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between chart-card">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-scale-unbalanced text-amber-500"></i>
+              Jurang Perjawatan Bersih
+            </h2>
+            <span class="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-100 text-slate-600">Defisit vs Lebihan</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-3">Defisit (+) memerlukan pengisian, Lebihan (-) bertugas melebihi waran rasmi.</p>
+
+          <div class="relative h-72 sm:h-80 w-full">
+            <canvas id="gapDivergingChart"></canvas>
+          </div>
+        </div>
+
+        <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-[11px] text-slate-500">
+          <span class="inline-flex items-center gap-1 text-red-600 font-semibold"><span class="w-2.5 h-2.5 rounded bg-red-500"></span> Defisit (Kekosongan)</span>
+          <span class="inline-flex items-center gap-1 text-purple-600 font-semibold"><span class="w-2.5 h-2.5 rounded bg-purple-500"></span> Lebihan Kuota</span>
+        </div>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <!-- Carta 3: Kluster Perkhidmatan Hospital -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between chart-card">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-shapes text-indigo-600"></i>
+              Pengisian Mengikut Kluster
+            </h2>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">Pengagihan staf Pembantu Perawatan Kesihatan mengikut sektor fungsi.</p>
+          <div class="relative h-60 w-full flex items-center justify-center">
+            <canvas id="clusterChart"></canvas>
+          </div>
+        </div>
+        <div class="mt-3 text-center text-[11px] text-slate-400">
+          Klinikal / Wad merangkumi bahagian terbesar pengisian PPK.
+        </div>
+      </div>
+
+      <!-- Carta 4: Nisbah Status & Pengagihan Keseluruhan -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between chart-card">
+        <div>
+          <div class="flex items-center justify-between mb-1">
+            <h2 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-chart-pie text-emerald-600"></i>
+              Nisbah Status Perjawatan
+            </h2>
+          </div>
+          <p class="text-xs text-slate-500 mb-4">Kadar pengisian vs kekosongan waran keseluruhan.</p>
+          <div class="relative h-60 w-full flex items-center justify-center">
+            <canvas id="donutChartStatus"></canvas>
+          </div>
+        </div>
+
+        <div class="mt-2 grid grid-cols-2 gap-2 text-center text-xs">
+          <div class="bg-emerald-50 rounded-xl p-2.5 border border-emerald-100">
+            <p class="text-slate-500 font-medium">Kadar Pengisian</p>
+            <p class="text-lg font-bold text-emerald-700" id="donutStatIsi">65.3% (211)</p>
+          </div>
+          <div class="bg-amber-50 rounded-xl p-2.5 border border-amber-100">
+            <p class="text-slate-500 font-medium">Kekosongan</p>
+            <p class="text-lg font-bold text-amber-700" id="donutStatKsg">34.7% (112)</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Kad Interaktif: Sorotan Unit Kritikal & Pilihan Pantas -->
+      <div class="bg-white p-5 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+        <div>
+          <div class="flex items-center justify-between mb-2">
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <i class="fa-solid fa-bolt text-amber-500"></i>
+              Tindakan Segera & Pintasan
+            </h3>
+            <span class="text-xs text-slate-400">Pilih Pantas</span>
+          </div>
+          <p class="text-xs text-slate-500 mb-3">Klik mana-mana unit di bawah untuk terus memfokuskan data dan perincian SSM-SSPA:</p>
+
+          <div class="space-y-2 text-xs">
+            <button onclick="selectDepartmentByCode('2.2.2')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 transition text-left group">
+              <div>
+                <span class="font-bold text-slate-800 group-hover:text-sky-700">2.2.2 Pengurusan</span>
+                <p class="text-[11px] text-slate-500">Kekosongan terbesar: 42 jawatan kosong</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-bold text-[11px]">77.8% Kosong</span>
+            </button>
+
+            <button onclick="selectDepartmentByCode('2.8.2')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-sky-50 border border-slate-200 hover:border-sky-300 transition text-left group">
+              <div>
+                <span class="font-bold text-slate-800 group-hover:text-sky-700">2.8.2 Paediatrik (Pead)</span>
+                <p class="text-[11px] text-slate-500">Waran U1: 63 (termasuk 5 waran U14)</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-red-100 text-red-700 font-bold text-[11px]">36 Kosong</span>
+            </button>
+
+            <button onclick="selectDepartmentByCode('2.7.2')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-purple-50 border border-slate-200 hover:border-purple-300 transition text-left group">
+              <div>
+                <span class="font-bold text-slate-800 group-hover:text-purple-700">2.7.2 O & G</span>
+                <p class="text-[11px] text-slate-500">Pengisian tertinggi melebihi waran (+18 staf)</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-purple-100 text-purple-700 font-bold text-[11px]">+18 Staf</span>
+            </button>
+
+            <button onclick="selectDepartmentByCode('2.3.2')" class="w-full flex items-center justify-between p-2.5 rounded-xl bg-slate-50 hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 transition text-left group">
+              <div>
+                <span class="font-bold text-slate-800 group-hover:text-emerald-700">2.3.2 Kecemasan & Trauma (ETD)</span>
+                <p class="text-[11px] text-slate-500">Waran: 23 | Pengisian: 16 | Kosong: 7</p>
+              </div>
+              <span class="px-2 py-0.5 rounded-md bg-emerald-100 text-emerald-800 font-bold text-[11px]">69.6% Isi</span>
+            </button>
+          </div>
+        </div>
+
+        <button onclick="resetAllFilters()" class="mt-3 w-full py-2 text-xs font-semibold rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 transition">
+          <i class="fa-solid fa-arrows-rotate mr-1"></i> Pulihkan Paparan Asal Semua Jabatan
+        </button>
+      </div>
+    </section>
+
+    <section class="bg-white rounded-2xl border border-slate-200 shadow-sm overflow-hidden" id="tableSection">
+      <!-- Toolbar & Penapis -->
+      <div class="p-4 sm:p-5 border-b border-slate-200 bg-slate-50/70 space-y-3">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <i class="fa-solid fa-table-list text-slate-700"></i>
+                Jadual Terperinci Perjawatan PPK (SSPA Gred U1)
+              </h3>
+              <span class="text-xs px-2 py-0.5 rounded-full bg-slate-200 text-slate-700 font-bold" id="tableCountBadge">23 Unit</span>
+            </div>
+            <p class="text-xs text-slate-500">Klik mana-mana baris untuk memaparkan pecahan terperinci SSM U14 & U11/14.</p>
+          </div>
+
+          <!-- Carian -->
+          <div class="relative w-full sm:w-72">
+            <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
+            <input type="text" id="searchInput" onkeyup="filterTable()" placeholder="Cari nama jabatan, kod (cth: 2.7.2)..." class="w-full pl-9 pr-8 py-2 text-xs rounded-xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500 bg-white shadow-sm">
+            <button onclick="clearSearch()" id="clearSearchBtn" class="hidden absolute right-2.5 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 text-xs">
+              <i class="fa-solid fa-circle-xmark"></i>
+            </button>
+          </div>
+        </div>
+
+        <!-- Filter Status Chips -->
+        <div class="flex flex-wrap items-center justify-between gap-2 pt-1 text-xs">
+          <div class="flex flex-wrap items-center gap-2">
+            <span class="text-slate-500 font-semibold mr-1">Tapis Status:</span>
+            <button onclick="setStatusFilter('ALL')" id="filter-ALL" class="filter-btn px-3 py-1 rounded-lg font-semibold bg-slate-800 text-white shadow-sm transition">Semua</button>
+            <button onclick="setStatusFilter('KSG')" id="filter-KSG" class="filter-btn px-3 py-1 rounded-lg font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition">Ada Kekosongan</button>
+            <button onclick="setStatusFilter('LEBIHAN')" id="filter-LEBIHAN" class="filter-btn px-3 py-1 rounded-lg font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition">Lebihan Penempatan</button>
+            <button onclick="setStatusFilter('OPTIMUM')" id="filter-OPTIMUM" class="filter-btn px-3 py-1 rounded-lg font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition">Optimum (100%)</button>
+            <button onclick="setStatusFilter('TIADA_WARAN')" id="filter-TIADA_WARAN" class="filter-btn px-3 py-1 rounded-lg font-semibold bg-white border border-slate-200 text-slate-600 hover:bg-slate-100 transition">Tiada Waran</button>
+          </div>
+          <div class="text-[11px] text-slate-400">
+            *Susun lajur: Klik tajuk lajur jadual
+          </div>
+        </div>
+      </div>
+
+      <div class="overflow-x-auto">
+        <table class="w-full text-left border-collapse text-xs md:text-sm" id="staffTable">
+          <thead>
+            <tr class="bg-slate-100/90 text-slate-700 text-xs uppercase tracking-wider font-semibold border-b border-slate-200 select-none">
+              <th onclick="sortTable('kod')" class="py-3 px-3.5 text-center w-14 cursor-pointer hover:bg-slate-200/60 transition">
+                Kod <i class="fa-solid fa-sort text-[10px] ml-1 text-slate-400"></i>
+              </th>
+              <th onclick="sortTable('nama')" class="py-3 px-4 min-w-[200px] cursor-pointer hover:bg-slate-200/60 transition">
+                Jabatan / Unit <i class="fa-solid fa-sort text-[10px] ml-1 text-slate-400"></i>
+              </th>
+              <th class="py-3 px-3 text-center bg-slate-200/40">SSM U14<br><span class="font-normal text-[10px] text-slate-500">Jum / Isi / Ksg</span></th>
+              <th class="py-3 px-3 text-center bg-slate-200/40">SSM U11/U14<br><span class="font-normal text-[10px] text-slate-500">Jum / Isi / Ksg</span></th>
+              <th onclick="sortTable('waran')" class="py-3 px-3 text-center text-blue-900 bg-blue-50/80 font-bold border-l border-blue-100 cursor-pointer hover:bg-blue-100/70 transition">
+                SSPA Gred U1<br>Waran <i class="fa-solid fa-sort text-[10px] ml-1 text-blue-400"></i>
+              </th>
+              <th onclick="sortTable('isi')" class="py-3 px-3 text-center text-emerald-900 bg-emerald-50/80 font-bold cursor-pointer hover:bg-emerald-100/70 transition">
+                SSPA Gred U1<br>Pengisian <i class="fa-solid fa-sort text-[10px] ml-1 text-emerald-400"></i>
+              </th>
+              <th onclick="sortTable('ksg')" class="py-3 px-3 text-center text-amber-900 bg-amber-50/80 font-bold border-r border-amber-100 cursor-pointer hover:bg-amber-100/70 transition">
+                SSPA Gred U1<br>Kekosongan <i class="fa-solid fa-sort text-[10px] ml-1 text-amber-400"></i>
+              </th>
+              <th onclick="sortTable('pct')" class="py-3 px-3 text-center cursor-pointer hover:bg-slate-200/60 transition">
+                Kadar Isi (%) <i class="fa-solid fa-sort text-[10px] ml-1 text-slate-400"></i>
+              </th>
+              <th class="py-3 px-4 text-center">Status / Tindakan</th>
+            </tr>
+          </thead>
+          <tbody id="tableBody" class="divide-y divide-slate-100">
+            <!-- Data rows injected by JS -->
+          </tbody>
+          <tfoot>
+            <tr class="bg-amber-100/80 font-bold text-slate-900 border-t-2 border-amber-300 text-xs md:text-sm">
+              <td colspan="2" class="py-3.5 px-4 text-left">JUMLAH KESELURUHAN (HOSPITAL MIRI)</td>
+              <td class="py-3.5 px-3 text-center text-slate-700">9 / 4 / 5</td>
+              <td class="py-3.5 px-3 text-center text-slate-700">314 / 207 / 107</td>
+              <td class="py-3.5 px-3 text-center text-blue-900 bg-blue-100/80 font-extrabold text-sm" id="footWaran">323</td>
+              <td class="py-3.5 px-3 text-center text-emerald-900 bg-emerald-100/80 font-extrabold text-sm" id="footIsi">211</td>
+              <td class="py-3.5 px-3 text-center text-amber-900 bg-amber-200/80 font-extrabold text-sm" id="footKsg">112</td>
+              <td class="py-3.5 px-3 text-center font-extrabold text-emerald-800" id="footPct">65.33%</td>
+              <td class="py-3.5 px-4 text-center">
+                <span class="inline-block px-2.5 py-1 text-[11px] font-bold rounded-full bg-slate-800 text-white">
+                  Kekosongan Bersih 112
+                </span>
+              </td>
+            </tr>
+          </tfoot>
+        </table>
+      </div>
+      <div id="noResult" class="hidden p-8 text-center text-slate-400">
+        <i class="fa-solid fa-folder-open text-3xl mb-2"></i>
+        <p class="text-sm">Tiada jabatan atau unit sepadan dengan carian.</p>
+      </div>
+    </section>
+
+    <section class="grid grid-cols-1 md:grid-cols-2 gap-6">
+      <!-- Kekosongan Kritikal -->
+      <div class="bg-white rounded-2xl p-5 border border-red-200/80 shadow-sm relative overflow-hidden">
+        <div class="absolute -right-3 -top-3 w-16 h-16 bg-red-50 rounded-full flex items-end justify-start p-3 text-red-200">
+          <i class="fa-solid fa-triangle-exclamation text-2xl"></i>
+        </div>
+        <h3 class="text-base font-bold text-red-900 flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-circle-exclamation text-red-600"></i>
+          Fokus Kekosongan Tertinggi (Defisit Waran)
+        </h3>
+        <p class="text-xs text-slate-600 mb-3">Unit-unit klinikal dan sokongan berikut memerlukan pengisian keutamaan dari pihak BSM / JKN Sarawak:</p>
+        <div class="space-y-2.5">
+          <div onclick="selectDepartmentByCode('2.2.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-red-50/60 border border-red-100 text-xs hover:bg-red-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.2.2 Pengurusan</span>
+              <p class="text-[11px] text-slate-500">Waran: 54 | Pengisian: 12</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-700 font-bold">42 Kosong (77.8%)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.8.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-red-50/60 border border-red-100 text-xs hover:bg-red-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.8.2 Paediatrik (Pead)</span>
+              <p class="text-[11px] text-slate-500">Waran: 63 | Pengisian: 27</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-700 font-bold">36 Kosong (57.1%)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.6.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-red-50/60 border border-red-100 text-xs hover:bg-red-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.6.2 Pembedahan Am</span>
+              <p class="text-[11px] text-slate-500">Waran: 48 | Pengisian: 22</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-700 font-bold">26 Kosong (54.2%)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.10.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-red-50/60 border border-red-100 text-xs hover:bg-red-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.10.2 Anestesiologi (Anest)</span>
+              <p class="text-[11px] text-slate-500">Waran: 48 | Pengisian: 27</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-red-100 text-red-700 font-bold">21 Kosong (43.8%)</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Lebihan Pengisian & Fleksi -->
+      <div class="bg-white rounded-2xl p-5 border border-purple-200/80 shadow-sm relative overflow-hidden">
+        <div class="absolute -right-3 -top-3 w-16 h-16 bg-purple-50 rounded-full flex items-end justify-start p-3 text-purple-200">
+          <i class="fa-solid fa-arrows-split-up-and-left text-2xl"></i>
+        </div>
+        <h3 class="text-base font-bold text-purple-900 flex items-center gap-2 mb-2">
+          <i class="fa-solid fa-arrow-trend-up text-purple-600"></i>
+          Penempatan Melebihi Waran Rasmi (Fleksi / Beban Kerja)
+        </h3>
+        <p class="text-xs text-slate-600 mb-3">Unit yang mempunyai jumlah staf bertugas melebihi waran asal akibat keperluan klinikal mendesak:</p>
+        <div class="space-y-2.5">
+          <div onclick="selectDepartmentByCode('2.7.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 text-xs hover:bg-purple-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.7.2 O & G (Obstetrik & Ginekologi)</span>
+              <p class="text-[11px] text-slate-500">Waran asal: 8 | Pengisian semasa: 26</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 font-bold">+18 Staf (-18 Ksg)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.9.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 text-xs hover:bg-purple-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.9.2 Ortopedik (Orto)</span>
+              <p class="text-[11px] text-slate-500">Waran asal: 5 | Pengisian semasa: 14</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 font-bold">+9 Staf (-9 Ksg)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.15.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 text-xs hover:bg-purple-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.15.2 Nefrologi (Nefro)</span>
+              <p class="text-[11px] text-slate-500">Waran asal: 3 | Pengisian semasa: 7</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 font-bold">+4 Staf (-4 Ksg)</span>
+          </div>
+          <div onclick="selectDepartmentByCode('2.28.2')" class="flex items-center justify-between p-2.5 rounded-xl bg-purple-50/60 border border-purple-100 text-xs hover:bg-purple-100/50 cursor-pointer transition">
+            <div>
+              <span class="font-bold text-slate-800">2.28.2 Rehabilitasi</span>
+              <p class="text-[11px] text-slate-500">Waran asal: 0 | Pengisian semasa: 4</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-lg bg-purple-100 text-purple-700 font-bold">+4 Staf (Tiada Waran)</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="bg-white border-t border-slate-200 mt-10 py-6 text-xs text-slate-500">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row items-center justify-between gap-3 text-center sm:text-left">
+      <div>
+        <p class="font-semibold text-slate-700">Hospital Miri, Sarawak — Unit Sumber Manusia</p>
+        <p>Pelaporan Bersepadu Pengisian Perjawatan Pembantu Perawatan Kesihatan (PPK) Gred U1 (SSPA).</p>
+      </div>
+      <div class="text-[11px] text-slate-400">
+        Disemak & Diselaraskan Mengikut Buku Rekod Perjawatan Terkini
+      </div>
+    </div>
+  </footer>
+
+  <!-- Modal Pop-up untuk Detail Jabatan -->
+  <div id="detailModal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-white rounded-2xl max-w-lg w-full p-6 shadow-2xl relative animate-in fade-in zoom-in duration-200">
+      <button onclick="closeModal()" class="absolute top-4 right-4 text-slate-400 hover:text-slate-600 w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center">
+        <i class="fa-solid fa-xmark text-sm"></i>
+      </button>
+      <div id="modalContent">
+        <!-- Injected via JavaScript -->
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Data lengkap perjawatan PPK Hospital Miri berkluster
+    const rawData = [
+      {
+        kod: "2.2.2",
+        nama: "Pengurusan",
+        kluster: "Pentadbiran & Sokongan",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 54, isi: 12, ksg: 42 },
+        sspa: { jum: 54, isi: 12, ksg: 42 },
+        catatan: "Kekosongan tinggi"
+      },
+      {
+        kod: "2.3.2",
+        nama: "ETD (Kecemasan & Trauma)",
+        kluster: "Kritikal & Kecemasan",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 23, isi: 16, ksg: 7 },
+        sspa: { jum: 23, isi: 16, ksg: 7 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.5.2",
+        nama: "Perubatan Am",
+        kluster: "Klinikal / Wad",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 35, isi: 31, ksg: 4 },
+        sspa: { jum: 35, isi: 31, ksg: 4 },
+        catatan: "Hampir optimum"
+      },
+      {
+        kod: "2.6.2",
+        nama: "Pembedahan Am",
+        kluster: "Pembedahan & OT",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 48, isi: 22, ksg: 26 },
+        sspa: { jum: 48, isi: 22, ksg: 26 },
+        catatan: "Kekosongan tinggi"
+      },
+      {
+        kod: "2.7.2",
+        nama: "O & G (Obstetrik & Ginekologi)",
+        kluster: "Ibu & Anak",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 8, isi: 26, ksg: -18 },
+        sspa: { jum: 8, isi: 26, ksg: -18 },
+        catatan: "Lebihan pengisian"
+      },
+      {
+        kod: "2.8.2",
+        nama: "Paediatrik (Pead)",
+        kluster: "Ibu & Anak",
+        u14: { jum: 5, isi: 0, ksg: 5 },
+        u11_14: { jum: 58, isi: 27, ksg: 31 },
+        sspa: { jum: 63, isi: 27, ksg: 36 },
+        catatan: "Kekosongan tinggi"
+      },
+      {
+        kod: "2.9.2",
+        nama: "Ortopedik (Orto)",
+        kluster: "Pembedahan & OT",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 5, isi: 14, ksg: -9 },
+        sspa: { jum: 5, isi: 14, ksg: -9 },
+        catatan: "Lebihan pengisian"
+      },
+      {
+        kod: "2.10.2",
+        nama: "Anestesiologi (Anest)",
+        kluster: "Kritikal & Kecemasan",
+        u14: { jum: 0, isi: 0, ksg: 0 },
+        u11_14: { jum: 48, isi: 27, ksg: 21 },
+        sspa: { jum: 48, isi: 27, ksg: 21 },
+        catatan: "Kekosongan sederhana"
+      },
+      {
+        kod: "2.11.2",
+        nama: "Oftalmologi (Oftal)",
+        kluster: "Klinikal Khusus",
+        u14: { jum: 0, isi: 2, ksg: -2 },
+        u11_14: { jum: 3, isi: 0, ksg: 3 },
+        sspa: { jum: 3, isi: 2, ksg: 1 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.12.2",
+        nama: "Otorinolaringologi (ENT)",
+        kluster: "Klinikal Khusus",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 2, isi: 2, ksg: 0 },
+        sspa: { jum: 2, isi: 2, ksg: 0 },
+        catatan: "Optimum"
+      },
+      {
+        kod: "2.13.2",
+        nama: "Dermatologi",
+        kluster: "Klinikal Khusus",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: "-", isi: "-", ksg: "-" },
+        sspa: { jum: 0, isi: 0, ksg: 0 },
+        catatan: "Tiada waran"
+      },
+      {
+        kod: "2.14.2",
+        nama: "Neurologi",
+        kluster: "Klinikal Khusus",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: "-", isi: "-", ksg: "-" },
+        sspa: { jum: 0, isi: 0, ksg: 0 },
+        catatan: "Tiada waran"
+      },
+      {
+        kod: "2.15.2",
+        nama: "Nefrologi (Nefro)",
+        kluster: "Klinikal Khusus",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 3, isi: 7, ksg: -4 },
+        sspa: { jum: 3, isi: 7, ksg: -4 },
+        catatan: "Lebihan pengisian"
+      },
+      {
+        kod: "2.16.2",
+        nama: "Pembedahan Neuro",
+        kluster: "Pembedahan & OT",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: "-", isi: "-", ksg: "-" },
+        sspa: { jum: 0, isi: 0, ksg: 0 },
+        catatan: "Tiada waran"
+      },
+      {
+        kod: "2.19.2",
+        nama: "Radioterapi",
+        kluster: "Diagnostik & Terapi",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: "-", isi: "-", ksg: "-" },
+        sspa: { jum: 0, isi: 0, ksg: 0 },
+        catatan: "Tiada waran"
+      },
+      {
+        kod: "2.20.2",
+        nama: "Radiologi",
+        kluster: "Diagnostik & Terapi",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 4, isi: 4, ksg: 0 },
+        sspa: { jum: 4, isi: 4, ksg: 0 },
+        catatan: "Optimum"
+      },
+      {
+        kod: "2.21.2",
+        nama: "Patologi",
+        kluster: "Diagnostik & Terapi",
+        u14: { jum: 1, isi: 0, ksg: 1 },
+        u11_14: { jum: 5, isi: 4, ksg: 1 },
+        sspa: { jum: 6, isi: 4, ksg: 2 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.22.2",
+        nama: "Farmasi",
+        kluster: "Pentadbiran & Sokongan",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 1, isi: 0, ksg: 1 },
+        sspa: { jum: 1, isi: 0, ksg: 1 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.23.2",
+        nama: "Makanan & Dapur (Sajian)",
+        kluster: "Pentadbiran & Sokongan",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 4, isi: 1, ksg: 3 },
+        sspa: { jum: 4, isi: 1, ksg: 3 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.27.2",
+        nama: "Psikiatri (Psy)",
+        kluster: "Klinikal / Wad",
+        u14: { jum: 3, isi: 2, ksg: 1 },
+        u11_14: { jum: 6, isi: 6, ksg: 0 },
+        sspa: { jum: 9, isi: 8, ksg: 1 },
+        catatan: "Hampir optimum"
+      },
+      {
+        kod: "2.28.2",
+        nama: "Rehabilitasi",
+        kluster: "Klinikal Khusus",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 0, isi: 4, ksg: -4 },
+        sspa: { jum: 0, isi: 4, ksg: -4 },
+        catatan: "Lebihan pengisian"
+      },
+      {
+        kod: "2.29.2",
+        nama: "Perubatan Transfusi",
+        kluster: "Diagnostik & Terapi",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 2, isi: 1, ksg: 1 },
+        sspa: { jum: 2, isi: 1, ksg: 1 },
+        catatan: "Kekosongan"
+      },
+      {
+        kod: "2.30.2",
+        nama: "Forensik",
+        kluster: "Diagnostik & Terapi",
+        u14: { jum: "-", isi: "-", ksg: "-" },
+        u11_14: { jum: 5, isi: 3, ksg: 2 },
+        sspa: { jum: 5, isi: 3, ksg: 2 },
+        catatan: "Kekosongan"
+      }
+    ];
+
+    // State variables
+    let currentFilter = 'ALL';
+    let chartDatasetFilter = 'ALL';
+    let chartOrientation = 'vertical';
+    let currentSortColumn = null;
+    let currentSortAsc = true;
+    let simulationActive = false;
+
+    function renderTable() {
+      const tbody = document.getElementById("tableBody");
+      const searchTerm = document.getElementById("searchInput").value.toLowerCase().trim();
+      tbody.innerHTML = "";
+
+      let list = [...rawData];
+
+      // Sorting
+      if (currentSortColumn) {
+        list.sort((a, b) => {
+          let valA, valB;
+          if (currentSortColumn === 'kod') {
+            valA = a.kod;
+            valB = b.kod;
+          } else if (currentSortColumn === 'nama') {
+            valA = a.nama;
+            valB = b.nama;
+          } else if (currentSortColumn === 'waran') {
+            valA = a.sspa.jum;
+            valB = b.sspa.jum;
+          } else if (currentSortColumn === 'isi') {
+            valA = a.sspa.isi;
+            valB = b.sspa.isi;
+          } else if (currentSortColumn === 'ksg') {
+            valA = a.sspa.ksg;
+            valB = b.sspa.ksg;
+          } else if (currentSortColumn === 'pct') {
+            valA = a.sspa.jum > 0 ? (a.sspa.isi / a.sspa.jum) : (a.sspa.isi > 0 ? 1 : 0);
+            valB = b.sspa.jum > 0 ? (b.sspa.isi / b.sspa.jum) : (b.sspa.isi > 0 ? 1 : 0);
+          }
+          if (valA < valB) return currentSortAsc ? -1 : 1;
+          if (valA > valB) return currentSortAsc ? 1 : -1;
+          return 0;
+        });
+      }
+
+      let visibleCount = 0;
+
+      list.forEach((item) => {
+        // Status filter check
+        let matchesStatus = true;
+        if (currentFilter === 'KSG') matchesStatus = item.sspa.ksg > 0;
+        else if (currentFilter === 'LEBIHAN') matchesStatus = item.sspa.ksg < 0;
+        else if (currentFilter === 'OPTIMUM') matchesStatus = item.sspa.jum > 0 && item.sspa.ksg === 0;
+        else if (currentFilter === 'TIADA_WARAN') matchesStatus = item.sspa.jum === 0 && item.sspa.isi === 0;
+
+        // Search text check
+        const matchesSearch = item.nama.toLowerCase().includes(searchTerm) || 
+                              item.kod.toLowerCase().includes(searchTerm) ||
+                              item.kluster.toLowerCase().includes(searchTerm);
+
+        if (matchesStatus && matchesSearch) {
+          visibleCount++;
+          const originalIndex = rawData.findIndex(d => d.kod === item.kod);
+          const tr = document.createElement("tr");
+          tr.id = `row-${item.kod.replace(/\./g, '-')}`;
+          tr.className = "hover:bg-sky-50/60 transition-colors border-b border-slate-100 cursor-pointer group";
+          tr.onclick = () => openModal(originalIndex);
+
+          // Calculate percentage
+          let pct = 0;
+          if (item.sspa.jum > 0) {
+            pct = Math.round((item.sspa.isi / item.sspa.jum) * 100);
+          } else if (item.sspa.isi > 0) {
+            pct = 100;
+          }
+
+          // Badge Status
+          let badge = "";
+          if (item.sspa.ksg < 0) {
+            badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-purple-100 text-purple-700 border border-purple-200">
+              <i class="fa-solid fa-arrow-trend-up text-[10px]"></i> Lebihan (+${Math.abs(item.sspa.ksg)})
+            </span>`;
+          } else if (item.sspa.jum > 0 && item.sspa.ksg === 0) {
+            badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-200">
+              <i class="fa-solid fa-check text-[10px]"></i> Optimum (100%)
+            </span>`;
+          } else if (item.sspa.ksg > 0) {
+            const urgencyClass = item.sspa.ksg >= 20 ? 'bg-red-100 text-red-700 border-red-200' : 'bg-amber-100 text-amber-800 border-amber-200';
+            badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-bold ${urgencyClass} border">
+              <i class="fa-solid fa-clock text-[10px]"></i> ${item.sspa.ksg} Kekosongan
+            </span>`;
+          } else {
+            badge = `<span class="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-slate-100 text-slate-500">
+              Tiada Waran
+            </span>`;
+          }
+
+          const u14Str = `${item.u14.jum} / ${item.u14.isi} / ${item.u14.ksg}`;
+          const u1114Str = `${item.u11_14.jum} / ${item.u11_14.isi} / ${item.u11_14.ksg}`;
+
+          tr.innerHTML = `
+            <td class="py-3 px-3.5 text-center font-mono font-bold text-slate-500 text-xs">${item.kod}</td>
+            <td class="py-3 px-4 font-semibold text-slate-900">
+              <div class="flex items-center justify-between">
+                <div>
+                  <span class="group-hover:text-sky-700 transition font-bold">${item.nama}</span>
+                  <p class="text-[10px] text-slate-400 font-normal">${item.kluster}</p>
+                </div>
+                <i class="fa-solid fa-chevron-right text-[10px] text-slate-300 group-hover:text-sky-500 group-hover:translate-x-0.5 transition ml-2"></i>
+              </div>
+            </td>
+            <td class="py-3 px-3 text-center text-slate-600 bg-slate-50/50">${u14Str}</td>
+            <td class="py-3 px-3 text-center text-slate-600 bg-slate-50/50">${u1114Str}</td>
+            <td class="py-3 px-3 text-center font-extrabold text-blue-900 bg-blue-50/40">${item.sspa.jum}</td>
+            <td class="py-3 px-3 text-center font-extrabold text-emerald-800 bg-emerald-50/40">${item.sspa.isi}</td>
+            <td class="py-3 px-3 text-center font-extrabold ${item.sspa.ksg < 0 ? 'text-purple-700 bg-purple-50/40' : item.sspa.ksg > 0 ? 'text-amber-800 bg-amber-50/40' : 'text-slate-500'}">
+              ${item.sspa.ksg}
+            </td>
+            <td class="py-3 px-3 text-center">
+              <div class="flex items-center justify-center gap-1.5">
+                <span class="font-bold text-xs ${pct > 100 ? 'text-purple-700' : pct >= 80 ? 'text-emerald-700' : 'text-slate-700'}">${pct}%</span>
+              </div>
+            </td>
+            <td class="py-3 px-4 text-center">${badge}</td>
+          `;
+
+          tbody.appendChild(tr);
+        }
+      });
+
+      document.getElementById("tableCountBadge").innerText = `${visibleCount} Unit`;
+      document.getElementById("noResult").classList.toggle("hidden", visibleCount > 0);
+      document.getElementById("clearSearchBtn").classList.toggle("hidden", searchTerm.length === 0);
+    }
+
+    // Sort table on header click
+    function sortTable(column) {
+      if (currentSortColumn === column) {
+        currentSortAsc = !currentSortAsc;
+      } else {
+        currentSortColumn = column;
+        currentSortAsc = true;
+      }
+      renderTable();
+    }
+
+    function clearSearch() {
+      document.getElementById("searchInput").value = "";
+      renderTable();
+    }
+
+    let barChartInstance = null;
+    let donutChartInstance = null;
+    let gapChartInstance = null;
+    let clusterChartInstance = null;
+
+    function getFilteredDataForBarChart() {
+      let filtered = rawData.filter(d => d.sspa.jum > 0 || d.sspa.isi > 0);
+
+      if (chartDatasetFilter === 'TOP_DEFICIT') {
+        filtered = [...filtered].sort((a, b) => b.sspa.ksg - a.sspa.ksg).slice(0, 8);
+      } else if (chartDatasetFilter === 'LEBIHAN') {
+        filtered = filtered.filter(d => d.sspa.ksg < 0);
+      }
+
+      return filtered;
+    }
+
+    function setChartDatasetFilter(type) {
+      chartDatasetFilter = type;
+      ['ALL', 'TOP_DEFICIT', 'LEBIHAN'].forEach(t => {
+        const btn = document.getElementById(`chartBtn-${t}`);
+        if (btn) {
+          if (t === type) {
+            btn.className = "px-2.5 py-1 rounded-lg font-semibold bg-white text-slate-800 shadow-sm transition";
+          } else {
+            btn.className = "px-2.5 py-1 rounded-lg font-semibold text-slate-600 hover:text-slate-900 transition";
+          }
+        }
+      });
+      updateBarChart();
+    }
+
+    function toggleChartType() {
+      chartOrientation = chartOrientation === 'vertical' ? 'horizontal' : 'vertical';
+      document.getElementById('chartTypeLabel').innerText = chartOrientation === 'vertical' ? 'Carta Menegak' : 'Carta Melintang';
+      initBarChart();
+    }
+
+    function initBarChart() {
+      if (barChartInstance) barChartInstance.destroy();
+
+      const activeUnits = getFilteredDataForBarChart();
+      const labels = activeUnits.map(d => d.nama.replace(/\(.*\)/, '').trim());
+      const waranData = activeUnits.map(d => d.sspa.jum);
+      const isiData = activeUnits.map(d => d.sspa.isi);
+
+      const ctxBar = document.getElementById('barChartDepartment').getContext('2d');
+      const isHorizontal = chartOrientation === 'horizontal';
+
+      barChartInstance = new Chart(ctxBar, {
+        type: isHorizontal ? 'bar' : 'bar',
+        data: {
+          labels: labels,
+          datasets: [
+            {
+              label: 'Waran SSPA U1',
+              data: waranData,
+              backgroundColor: '#0284c7',
+              hoverBackgroundColor: '#0369a1',
+              borderRadius: 6,
+              barPercentage: 0.7
+            },
+            {
+              label: 'Pengisian Sebenar',
+              data: isiData,
+              backgroundColor: '#10b981',
+              hoverBackgroundColor: '#059669',
+              borderRadius: 6,
+              barPercentage: 0.7
+            }
+          ]
+        },
+        options: {
+          indexAxis: isHorizontal ? 'y' : 'x',
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const elIndex = elements[0].index;
+              const selectedItem = activeUnits[elIndex];
+              selectDepartmentByCode(selectedItem.kod);
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleFont: { size: 12, weight: 'bold' },
+              padding: 10,
+              cornerRadius: 8,
+              callbacks: {
+                afterBody: (context) => {
+                  const idx = context[0].dataIndex;
+                  const item = activeUnits[idx];
+                  return `Kod: ${item.kod}\nBaki/Jurang: ${item.sspa.ksg} (${item.sspa.ksg < 0 ? 'Lebihan' : 'Kekosongan'})`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { display: isHorizontal, color: '#f1f5f9' },
+              ticks: {
+                maxRotation: isHorizontal ? 0 : 45,
+                minRotation: isHorizontal ? 0 : 45,
+                font: { size: 10 }
+              }
+            },
+            y: {
+              beginAtZero: true,
+              grid: { color: isHorizontal ? 'transparent' : '#f1f5f9' },
+              ticks: { stepSize: 10, font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function updateBarChart() {
+      const activeUnits = getFilteredDataForBarChart();
+      barChartInstance.data.labels = activeUnits.map(d => d.nama.replace(/\(.*\)/, '').trim());
+      barChartInstance.data.datasets[0].data = activeUnits.map(d => d.sspa.jum);
+      barChartInstance.data.datasets[1].data = activeUnits.map(d => d.sspa.isi);
+      barChartInstance.update();
+    }
+
+    function initGapChart() {
+      if (gapChartInstance) gapChartInstance.destroy();
+
+      // Only show departments that have either a deficit or a surplus
+      const gapUnits = rawData
+        .filter(d => d.sspa.ksg !== 0 && (d.sspa.jum > 0 || d.sspa.isi > 0))
+        .sort((a, b) => b.sspa.ksg - a.sspa.ksg);
+
+      const labels = gapUnits.map(d => d.nama.replace(/\(.*\)/, '').trim());
+      const gapValues = gapUnits.map(d => d.sspa.ksg);
+
+      // Colors: Red/Amber for deficit (> 0), Purple for surplus (< 0)
+      const backgroundColors = gapValues.map(v => v > 0 ? (v >= 20 ? '#ef4444' : '#f59e0b') : '#a855f7');
+      const hoverColors = gapValues.map(v => v > 0 ? '#b91c1c' : '#7e22ce');
+
+      const ctxGap = document.getElementById('gapDivergingChart').getContext('2d');
+      gapChartInstance = new Chart(ctxGap, {
+        type: 'bar',
+        data: {
+          labels: labels,
+          datasets: [{
+            label: 'Jurang Bersih Kuota',
+            data: gapValues,
+            backgroundColor: backgroundColors,
+            hoverBackgroundColor: hoverColors,
+            borderRadius: 5,
+            barPercentage: 0.65
+          }]
+        },
+        options: {
+          indexAxis: 'y',
+          responsive: true,
+          maintainAspectRatio: false,
+          onClick: (evt, elements) => {
+            if (elements.length > 0) {
+              const elIndex = elements[0].index;
+              const selectedItem = gapUnits[elIndex];
+              selectDepartmentByCode(selectedItem.kod);
+            }
+          },
+          plugins: {
+            legend: { display: false },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              padding: 10,
+              callbacks: {
+                label: (ctx) => {
+                  const val = ctx.raw;
+                  return val > 0 ? ` Defisit: ${val} Jawatan Kosong` : ` Lebihan: ${Math.abs(val)} Staf Tambahan`;
+                }
+              }
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: '#e2e8f0' },
+              ticks: {
+                stepSize: 10,
+                font: { size: 10 },
+                callback: (val) => val === 0 ? '0' : val > 0 ? `+${val}` : `${val}`
+              }
+            },
+            y: {
+              grid: { display: false },
+              ticks: { font: { size: 10 } }
+            }
+          }
+        }
+      });
+    }
+
+    function initClusterChart() {
+      if (clusterChartInstance) clusterChartInstance.destroy();
+
+      // Aggregate by cluster
+      const clusters = {};
+      rawData.forEach(item => {
+        if (!clusters[item.kluster]) {
+          clusters[item.kluster] = { waran: 0, isi: 0 };
+        }
+        clusters[item.kluster].waran += item.sspa.jum;
+        clusters[item.kluster].isi += item.sspa.isi;
+      });
+
+      const clusterLabels = Object.keys(clusters);
+      const clusterIsiData = clusterLabels.map(k => clusters[k].isi);
+
+      const ctxCluster = document.getElementById('clusterChart').getContext('2d');
+      clusterChartInstance = new Chart(ctxCluster, {
+        type: 'polarArea',
+        data: {
+          labels: clusterLabels,
+          datasets: [{
+            data: clusterIsiData,
+            backgroundColor: [
+              'rgba(14, 165, 233, 0.75)',
+              'rgba(16, 185, 129, 0.75)',
+              'rgba(168, 85, 247, 0.75)',
+              'rgba(245, 158, 11, 0.75)',
+              'rgba(99, 102, 241, 0.75)',
+              'rgba(236, 72, 153, 0.75)'
+            ],
+            borderWidth: 1.5,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: { boxWidth: 10, font: { size: 9 }, padding: 8 }
+            },
+            tooltip: {
+              callbacks: {
+                label: (ctx) => ` Staf Bertugas: ${ctx.raw} orang`
+              }
+            }
+          },
+          scales: {
+            r: {
+              ticks: { display: false }
+            }
+          }
+        }
+      });
+    }
+
+    function initDonutChart(isiCount = 211, ksgCount = 112) {
+      if (donutChartInstance) donutChartInstance.destroy();
+
+      const total = isiCount + ksgCount;
+      const pctIsi = ((isiCount / 323) * 100).toFixed(1);
+      const pctKsg = ((ksgCount / 323) * 100).toFixed(1);
+
+      document.getElementById('donutStatIsi').innerText = `${pctIsi}% (${isiCount})`;
+      document.getElementById('donutStatKsg').innerText = `${pctKsg}% (${ksgCount})`;
+
+      const ctxDonut = document.getElementById('donutChartStatus').getContext('2d');
+      donutChartInstance = new Chart(ctxDonut, {
+        type: 'doughnut',
+        data: {
+          labels: [`Pengisian Sebenar (${isiCount})`, `Kekosongan Waran (${ksgCount})`],
+          datasets: [{
+            data: [isiCount, Math.max(0, ksgCount)],
+            backgroundColor: ['#10b981', '#f59e0b'],
+            hoverBackgroundColor: ['#059669', '#d97706'],
+            borderWidth: 3,
+            borderColor: '#ffffff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          cutout: '72%',
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                boxWidth: 12,
+                padding: 12,
+                font: { size: 11, weight: 'bold' }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    function selectDepartmentByCode(kod) {
+      // Set search input to this code
+      const input = document.getElementById("searchInput");
+      input.value = kod;
+      currentFilter = 'ALL';
+      updateFilterButtons();
+      renderTable();
+
+      // Scroll smoothly to table
+      document.getElementById("tableSection").scrollIntoView({ behavior: 'smooth' });
+
+      // Open detail modal for immediate deep inspection
+      const idx = rawData.findIndex(d => d.kod === kod);
+      if (idx !== -1) {
+        setTimeout(() => openModal(idx), 350);
+      }
+    }
+
+    function resetAllFilters() {
+      document.getElementById("searchInput").value = "";
+      currentFilter = 'ALL';
+      chartDatasetFilter = 'ALL';
+      currentSortColumn = null;
+      updateFilterButtons();
+      setChartDatasetFilter('ALL');
+      renderTable();
+    }
+
+    function setStatusFilter(type) {
+      currentFilter = type;
+      updateFilterButtons();
+      renderTable();
+    }
+
+    function updateFilterButtons() {
+      document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('bg-slate-800', 'text-white');
+        btn.classList.add('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+      });
+      const activeBtn = document.getElementById(`filter-${currentFilter}`);
+      if (activeBtn) {
+        activeBtn.classList.remove('bg-white', 'text-slate-600', 'border', 'border-slate-200');
+        activeBtn.classList.add('bg-slate-800', 'text-white');
+      }
+    }
+
+    // Simulation tool
+    function toggleSimulator() {
+      const panel = document.getElementById("simulatorPanel");
+      const btnText = document.getElementById("simBtnText");
+      if (panel.classList.contains("hidden")) {
+        panel.classList.remove("hidden");
+        btnText.innerText = "Tutup Simulasi";
+        panel.scrollIntoView({ behavior: 'smooth' });
+      } else {
+        panel.classList.add("hidden");
+        btnText.innerText = "Simulasi Agihan Staf";
+      }
+    }
+
+    function updateSimulation() {
+      const newHires = parseInt(document.getElementById("simNewHiresSlider").value, 10);
+      const target = document.getElementById("simTargetDept").value;
+      document.getElementById("simNewHiresVal").innerText = `+${newHires} Staf`;
+
+      const baseIsi = 211;
+      const baseWaran = 323;
+      const newTotalIsi = baseIsi + newHires;
+      const newTotalKsg = Math.max(0, baseWaran - newTotalIsi);
+      const newRate = ((newTotalIsi / baseWaran) * 100).toFixed(1);
+
+      document.getElementById("simResultRate").innerText = `${newRate}%`;
+      document.getElementById("simResultDeficit").innerText = `${newTotalKsg}`;
+      document.getElementById("simResultSummary").innerText = `Unjuran: ${newTotalIsi} daripada ${baseWaran} waran diisi (+${newHires} pelantikan PPK baharu).`;
+
+      // Update KPI displays temporarily to reflect simulation
+      document.getElementById("stat-total-isi").innerText = `${newTotalIsi}`;
+      document.getElementById("stat-kadar-isi").innerText = `${newRate}%`;
+      document.getElementById("stat-total-ksg").innerText = `${newTotalKsg}`;
+      document.getElementById("stat-staf-bertugas").innerText = `${newTotalIsi} orang`;
+      document.getElementById("stat-defisit-waran").innerText = `${newTotalKsg} kuota`;
+
+      // Update Donut
+      initDonutChart(newTotalIsi, newTotalKsg);
+    }
+
+    function resetSimulation() {
+      document.getElementById("simNewHiresSlider").value = 0;
+      document.getElementById("simTargetDept").value = "PROPORTIONAL";
+      document.getElementById("simNewHiresVal").innerText = "+0 Staf";
+      document.getElementById("simResultRate").innerText = "65.3%";
+      document.getElementById("simResultDeficit").innerText = "112";
+      document.getElementById("simResultSummary").innerText = "Data semasa: 211 diisi daripada 323 waran jawatan.";
+
+      // Reset KPI display
+      document.getElementById("stat-total-isi").innerText = "211";
+      document.getElementById("stat-kadar-isi").innerText = "65.3%";
+      document.getElementById("stat-total-ksg").innerText = "112";
+      document.getElementById("stat-staf-bertugas").innerText = "211 orang";
+      document.getElementById("stat-defisit-waran").innerText = "112 kuota";
+
+      initDonutChart(211, 112);
+    }
+
+    // Modal Details view
+    function openModal(index) {
+      const item = rawData[index];
+      const modal = document.getElementById("detailModal");
+      const content = document.getElementById("modalContent");
+
+      content.innerHTML = `
+        <div class="flex items-center gap-3 mb-4 border-b pb-3">
+          <div class="w-11 h-11 rounded-xl bg-gradient-to-br from-sky-500 to-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md">
+            <i class="fa-solid fa-hospital-user"></i>
+          </div>
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs font-mono font-bold text-sky-600 bg-sky-50 px-2 py-0.5 rounded border border-sky-200">KOD ${item.kod}</span>
+              <span class="text-[11px] font-semibold text-slate-500">${item.kluster}</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mt-0.5">${item.nama}</h3>
+          </div>
+        </div>
+
+        <div class="space-y-4">
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Penyelarasan Rasmi SSPA Gred U1</h4>
+            <div class="grid grid-cols-3 gap-2 text-center">
+              <div class="bg-white p-2.5 rounded-xl border border-blue-100 shadow-sm">
+                <p class="text-[11px] text-slate-500">Jumlah Waran</p>
+                <p class="text-xl font-extrabold text-blue-700">${item.sspa.jum}</p>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-emerald-100 shadow-sm">
+                <p class="text-[11px] text-slate-500">Pengisian</p>
+                <p class="text-xl font-extrabold text-emerald-700">${item.sspa.isi}</p>
+              </div>
+              <div class="bg-white p-2.5 rounded-xl border border-amber-100 shadow-sm">
+                <p class="text-[11px] text-slate-500">Baki / Jurang</p>
+                <p class="text-xl font-extrabold ${item.sspa.ksg < 0 ? 'text-purple-700' : item.sspa.ksg > 0 ? 'text-amber-700' : 'text-slate-600'}">${item.sspa.ksg}</p>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-slate-50 p-3.5 rounded-xl border border-slate-200">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-slate-500 mb-2">Pecahan Asal Skim SSM Terdahulu</h4>
+            <div class="space-y-2 text-xs">
+              <div class="flex justify-between py-1.5 border-b border-slate-200">
+                <span class="text-slate-600 font-medium">Gred SSM U14 (Jum / Isi / Ksg):</span>
+                <span class="font-bold font-mono text-slate-800">${item.u14.jum} / ${item.u14.isi} / ${item.u14.ksg}</span>
+              </div>
+              <div class="flex justify-between py-1.5">
+                <span class="text-slate-600 font-medium">Gred SSM U11/U14 (Jum / Isi / Ksg):</span>
+                <span class="font-bold font-mono text-slate-800">${item.u11_14.jum} / ${item.u11_14.isi} / ${item.u11_14.ksg}</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl ${item.sspa.ksg < 0 ? 'bg-purple-50 border border-purple-200 text-purple-900' : item.sspa.ksg > 0 ? 'bg-amber-50 border border-amber-200 text-amber-900' : 'bg-emerald-50 border border-emerald-200 text-emerald-900'} text-xs">
+            <span class="font-bold flex items-center gap-1.5 mb-1">
+              <i class="fa-solid fa-clipboard-check"></i> Status Operasi Hospital:
+            </span>
+            ${item.sspa.ksg < 0 ? `Unit ini mempunyai pengisian melebihi waran rasmi sebanyak <strong>${Math.abs(item.sspa.ksg)} staf</strong> bagi menampung perkhidmatan kritikal pesakit.` : item.sspa.ksg > 0 ? `Unit ini mempunyai defisit <strong>${item.sspa.ksg} jawatan kosong</strong> yang memerlukan peruntukan pengisian Bahagian Sumber Manusia.` : `Unit ini beroperasi pada kapasiti penuh (100%) menepati waran yang diperuntukkan.`}
+          </div>
+        </div>
+      `;
+
+      modal.classList.remove("hidden");
+    }
+
+    function closeModal() {
+      document.getElementById("detailModal").classList.add("hidden");
+    }
+
+    window.onclick = function(event) {
+      const modal = document.getElementById("detailModal");
+      if (event.target === modal) {
+        closeModal();
+      }
+    };
+
+    // Export CSV
+    function exportToCSV() {
+      let csv = "Kod Unit,Nama Jabatan,Kluster,SSM U14 (Jum/Isi/Ksg),SSM U11/14 (Jum/Isi/Ksg),SSPA Gred U1 Waran,SSPA Gred U1 Pengisian,SSPA Gred U1 Kekosongan,Status\n";
+      
+      rawData.forEach(row => {
+        const u14 = `${row.u14.jum}/${row.u14.isi}/${row.u14.ksg}`;
+        const u11 = `${row.u11_14.jum}/${row.u11_14.isi}/${row.u11_14.ksg}`;
+        csv += `"${row.kod}","${row.nama}","${row.kluster}","${u14}","${u11}",${row.sspa.jum},${row.sspa.isi},${row.sspa.ksg},"${row.catatan}"\n`;
+      });
+
+      csv += `"JUMLAH","KESELURUHAN","Semua Kluster","9/4/5","314/207/107",323,211,112,"Kadar Pengisian: 65.33%"\n`;
+
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement("a");
+      const url = URL.createObjectURL(blob);
+      link.setAttribute("href", url);
+      link.setAttribute("download", "Data_Perjawatan_PPK_Hospital_Miri_SSPA_U1.csv");
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+
+    // Inisialisasi utama
+    window.onload = function() {
+      renderTable();
+      initBarChart();
+      initGapChart();
+      initClusterChart();
+      initDonutChart();
+    };
+  </script>
+</body>
+</html>
